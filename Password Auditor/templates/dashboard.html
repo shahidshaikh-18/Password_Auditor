@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Dashboard</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="card wide">
+      <h2>Password Vault Dashboard</h2>
+
+      <h3>Check a Password</h3>
+      <form method="POST">
+        <input type="hidden" name="form_type" value="check_password" />
+        <label>Enter a password to check</label>
+        <div class="password-wrapper">
+          <input
+            name="check_password_input"
+            type="password"
+            id="checkPasswordInput"
+            required
+          />
+          <i
+            class="fa-solid fa-eye-slash eye-icon"
+            id="toggleCheckPassword"
+          ></i>
+        </div>
+        <button type="submit">Check Password</button>
+      </form>
+
+      {% if check_result %}
+      <div class="results">
+        <p>Length: {{ check_result.length_msg }}</p>
+        <p>Complexity: {{ check_result.complexity_msg }}</p>
+        <p>Breach Status: {{ check_result.pwned_msg }}</p>
+      </div>
+      {% endif %}
+
+      <hr class="section-divider" />
+
+      <h3>Save a New Password</h3>
+      <form method="POST">
+        <input type="hidden" name="form_type" value="add_entry" />
+
+        <label>Site / App Name</label>
+        <input name="site" placeholder="e.g. Gmail" required />
+
+        <label>Username / Email</label>
+        <input
+          name="site_username"
+          placeholder="e.g. user@gmail.com"
+          required
+        />
+
+        <label>Password</label>
+        <div class="password-wrapper">
+          <input
+            name="site_password"
+            type="password"
+            id="sitePasswordInput"
+            required
+          />
+          <i class="fa-solid fa-eye-slash eye-icon" id="toggleSitePassword"></i>
+        </div>
+
+        <button type="submit">Save to Vault</button>
+      </form>
+
+      <div class="results">
+        <h3>Saved Entries</h3>
+        {% if entries %}
+        <table>
+          <thead>
+            <tr>
+              <th>Site</th>
+              <th>Username</th>
+              <th>Password</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for entry in entries %}
+            <tr>
+              <td>{{ entry.site }}</td>
+              <td>{{ entry.site_username }}</td>
+              <td>
+                <span class="masked-password">
+                  <span class="dots">••••••••</span>
+                  <span class="real-password" style="display: none"
+                    >{{ entry.password }}</span
+                  >
+                </span>
+                <i class="fa-solid fa-eye toggle-pw"></i>
+                <i class="fa-solid fa-copy copy-pw"></i>
+              </td>
+              <td>
+                <form
+                  method="POST"
+                  action="{{ url_for('vault_bp.delete_entry', entry_id=entry.id) }}"
+                >
+                  <button type="submit" class="delete-btn">Delete</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <p class="empty-state">No passwords saved yet.</p>
+        {% endif %}
+      </div>
+    </div>
+
+   <script>
+    document.querySelectorAll(".toggle-pw").forEach(function (icon) {
+        icon.addEventListener("click", function () {
+            const wrapper = icon.previousElementSibling;
+            const dots = wrapper.querySelector(".dots");
+            const real = wrapper.querySelector(".real-password");
+
+            const isHidden = real.style.display === "none";
+            real.style.display = isHidden ? "inline" : "none";
+            dots.style.display = isHidden ? "none" : "inline";
+
+            icon.classList.toggle("fa-eye");
+            icon.classList.toggle("fa-eye-slash");
+        });
+    });
+
+    document.querySelectorAll(".copy-pw").forEach(function (icon) {
+        icon.addEventListener("click", function () {
+            const wrapper = icon.parentElement.querySelector(".masked-password");
+            const realPassword = wrapper.querySelector(".real-password").textContent;
+
+            navigator.clipboard.writeText(realPassword).then(function () {
+                const original = icon.className;
+                icon.className = "fa-solid fa-check copy-pw";
+                setTimeout(function () {
+                    icon.className = original;
+                }, 1200);
+            });
+        });
+    });
+
+    function setupPasswordToggle(toggleId, inputId) {
+        const toggle = document.getElementById(toggleId);
+        const input = document.getElementById(inputId);
+
+        toggle.addEventListener("click", function () {
+            const isHidden = input.type === "password";
+            input.type = isHidden ? "text" : "password";
+            toggle.classList.toggle("fa-eye");
+            toggle.classList.toggle("fa-eye-slash");
+        });
+    }
+
+    setupPasswordToggle("toggleCheckPassword", "checkPasswordInput");
+    setupPasswordToggle("toggleSitePassword", "sitePasswordInput");
+</script>
+  </body>
+</html>

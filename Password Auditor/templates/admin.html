@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Database Viewer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="card wide">
+        <h2>Database Viewer (Admin)</h2>
+
+        <h3>Users Table</h3>
+        {% if users %}
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Password Hash</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>{{ user.id }}</td>
+                            <td>{{ user.username }}</td>
+                            <td class="hash-cell">{{ user.password_hash }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="empty-state">No users yet.</p>
+        {% endif %}
+
+        <hr class="section-divider">
+
+        <h3>Vault Entries Table (All Users)</h3>
+        {% if entries %}
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Owner</th>
+                            <th>Site</th>
+                            <th>Site Username</th>
+                            <th>Decrypted Password</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in entries %}
+                        <tr>
+                            <td>{{ entry.username }}</td>
+                            <td>{{ entry.site }}</td>
+                            <td>{{ entry.site_username }}</td>
+                            <td>{{ entry.password }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="empty-state">No vault entries yet.</p>
+        {% endif %}
+
+        <div class="nav-links">
+            <a href="/dashboard">Back to Dashboard</a>
+        </div>
+    </div>
+</body>
+</html>

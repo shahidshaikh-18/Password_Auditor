@@ -51,7 +51,7 @@ Password-Auditor-Vault/
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/Password-Auditor-Vault.git
+git clone https://github.com/shahidshaikh-18/Password-Auditor-Vault.git
 cd Password-Auditor-Vault
 ```
 
